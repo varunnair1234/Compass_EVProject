@@ -1,0 +1,427 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compass — EV Battery + Charging + Buying</title>
+  <style>
+    :root{
+      --bg:#0b0f17; --panel:#121a2a; --panel2:#0f1626; --text:#e9eefb; --muted:#a9b4cf;
+      --green:#57d38c; --yellow:#ffd166; --purple:#b695ff; --red:#ff5a7a; --blue:#5aa7ff;
+      --border: rgba(255,255,255,.10);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(87,211,140,.12), transparent 60%),
+                  radial-gradient(900px 600px at 80% 0%, rgba(182,149,255,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit}
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 70px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--purple));
+      box-shadow:0 10px 30px rgba(90,167,255,.25);
+    }
+    .brand h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .pill{padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.04);
+      color:var(--muted);font-size:12px;display:flex;gap:8px;align-items:center
+    }
+    .hero{margin-top:18px;padding:18px 18px 10px;border:1px solid var(--border);border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+    .hero h2{margin:0 0 6px;font-size:26px}
+    .hero p{margin:0;color:var(--muted);line-height:1.4}
+    .tabs{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+    .tab{border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);
+      padding:10px 12px;cursor:pointer;user-select:none;display:flex;gap:8px;align-items:center
+    }
+    .tab[aria-selected="true"]{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
+    .tab .dot{width:10px;height:10px;border-radius:50%}
+    .dot.green{background:var(--green)}
+    .dot.yellow{background:var(--yellow)}
+    .dot.purple{background:var(--purple)}
+
+    .grid{margin-top:16px;display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.04);padding:14px}
+    .card h3{margin:0 0 10px;font-size:16px}
+    label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}
+    input, select, textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,14,22,.55);color:var(--text);outline:none}
+    input:focus, select:focus, textarea:focus{border-color:rgba(90,167,255,.55);box-shadow:0 0 0 3px rgba(90,167,255,.15)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:550px){.row{grid-template-columns:1fr}}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);color:var(--text);cursor:pointer}
+    button.primary{background:linear-gradient(135deg, rgba(90,167,255,.28), rgba(182,149,255,.24));
+      border-color:rgba(182,149,255,.30)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .out{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+      font-size:12px;line-height:1.35;color:#dce6ff;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;padding:10px;min-height:120px}
+    .small{color:var(--muted);font-size:12px}
+    .err{color:#ffd1d8;border:1px solid rgba(255,90,122,.35);background:rgba(255,90,122,.10);padding:10px;border-radius:12px}
+    .ok{color:#d8ffe8;border:1px solid rgba(87,211,140,.35);background:rgba(87,211,140,.08);padding:10px;border-radius:12px}
+    footer{margin-top:18px;color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Compass</h1>
+          <div class="small">Battery Tracker • Charge Finder • EVs to Buy</div>
+        </div>
+      </div>
+      <div class="pill">
+        <span>API</span>
+        <code id="apiBaseLabel"></code>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h2>Welcome to Compass!</h2>
+      <p>Track battery health over time, pick the best charging station near you, and get EV buying recommendations.
+        This is a simple <b>index.html</b> template that talks to a <b>FastAPI</b> backend.</p>
+
+      <div class="tabs" role="tablist" aria-label="Compass features">
+        <div class="tab" role="tab" id="tab-battery" aria-controls="panel-battery" aria-selected="true" data-panel="battery">
+          <span class="dot green"></span> Battery Tracker
+        </div>
+        <div class="tab" role="tab" id="tab-stations" aria-controls="panel-stations" aria-selected="false" data-panel="stations">
+          <span class="dot yellow"></span> Charge Finder
+        </div>
+        <div class="tab" role="tab" id="tab-buy" aria-controls="panel-buy" aria-selected="false" data-panel="buy">
+          <span class="dot purple"></span> EVs to Buy
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card" id="panel-battery" role="tabpanel" aria-labelledby="tab-battery">
+        <h3>Battery Tracker</h3>
+        <div class="row">
+          <div>
+            <label>Make</label>
+            <input id="vMake" value="Tesla" />
+          </div>
+          <div>
+            <label>Model</label>
+            <input id="vModel" value="Model 3" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Year</label>
+            <input id="vYear" type="number" value="2024" />
+          </div>
+          <div>
+            <label>Connector Type</label>
+            <select id="vConnector">
+              <option value="">(optional)</option>
+              <option>NACS</option>
+              <option>CCS</option>
+              <option>CHAdeMO</option>
+              <option>J1772</option>
+            </select>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="primary" id="btnCreateVehicle">Create Vehicle</button>
+          <button id="btnListVehicles">List Vehicles</button>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:14px 0" />
+
+        <label>Vehicle ID (from list)</label>
+        <input id="vehicleId" placeholder="e.g. 1" />
+
+        <div class="row">
+          <div>
+            <label>Snapshot Date</label>
+            <input id="sDate" type="date" />
+          </div>
+          <div>
+            <label>Odometer (mi)</label>
+            <input id="sOdo" type="number" value="12000" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Full-charge Range (mi) (optional)</label>
+            <input id="sRange" type="number" placeholder="e.g. 270" />
+          </div>
+          <div>
+            <label>SoH % (optional)</label>
+            <input id="sSoh" type="number" placeholder="e.g. 96" />
+          </div>
+        </div>
+        <div class="btns">
+          <button class="primary" id="btnAddSnapshot">Add Snapshot</button>
+          <button id="btnGetHealth">Get Health</button>
+        </div>
+
+        <div style="margin-top:10px" id="batteryMsg"></div>
+      </section>
+
+      <aside class="card">
+        <h3>Output</h3>
+        <div class="small">Responses from the backend API will show here.</div>
+        <div class="out" id="output"></div>
+      </aside>
+
+      <section class="card" id="panel-stations" role="tabpanel" aria-labelledby="tab-stations" style="display:none">
+        <h3>Charge Finder</h3>
+        <div class="row">
+          <div>
+            <label>Your Latitude</label>
+            <input id="lat" type="number" value="36.9741" step="0.0001" />
+          </div>
+          <div>
+            <label>Your Longitude</label>
+            <input id="lon" type="number" value="-122.0308" step="0.0001" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Connector Type (optional)</label>
+            <select id="stConnector">
+              <option value="">Any</option>
+              <option>NACS</option>
+              <option>CCS</option>
+              <option>CHAdeMO</option>
+              <option>J1772</option>
+            </select>
+          </div>
+          <div>
+            <label>Your Max Charge kW (optional)</label>
+            <input id="vehicleMaxKw" type="number" placeholder="e.g. 200" />
+          </div>
+        </div>
+        <div class="btns">
+          <button class="primary" id="btnRecommendStations">Recommend Stations</button>
+          <button id="btnListStations">List Stations</button>
+        </div>
+        <div style="margin-top:10px" id="stationsMsg"></div>
+      </section>
+
+      <section class="card" id="panel-buy" role="tabpanel" aria-labelledby="tab-buy" style="display:none">
+        <h3>EVs to Buy</h3>
+        <div class="row">
+          <div>
+            <label>Budget ($)</label>
+            <input id="budget" type="number" value="42000" />
+          </div>
+          <div>
+            <label>Minimum Range (mi)</label>
+            <input id="minRange" type="number" value="250" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Needs Cargo (cu ft) (optional)</label>
+            <input id="cargo" type="number" value="0" />
+          </div>
+          <div>
+            <label>Prefer Connector (optional)</label>
+            <select id="buyConnector">
+              <option value="">No preference</option>
+              <option>NACS</option>
+              <option>CCS</option>
+            </select>
+          </div>
+        </div>
+        <label style="display:flex;gap:8px;align-items:center;margin-top:10px">
+          <input id="wantsAwd" type="checkbox" /> Wants AWD
+        </label>
+        <div class="btns">
+          <button class="primary" id="btnRecommendEvs">Recommend EVs</button>
+        </div>
+        <div style="margin-top:10px" id="buyMsg"></div>
+      </section>
+    </div>
+
+    <footer>
+      <div>Tip: set <code>window.API_BASE</code> or edit the <code>API_BASE</code> constant below to match your AWS API URL.</div>
+    </footer>
+  </div>
+
+  <script>
+    // ===== Config =====
+    const API_BASE = window.API_BASE || "http://localhost:8000";
+    document.getElementById('apiBaseLabel').textContent = API_BASE;
+
+    // ===== Helpers =====
+    const $ = (id) => document.getElementById(id);
+    const out = (obj) => { $("output").textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2); };
+    const msg = (id, kind, text) => {
+      const el = $(id);
+      el.innerHTML = `<div class="${kind}">${text}</div>`;
+    };
+    const clearMsg = (id) => { $(id).innerHTML = ""; };
+
+    async function api(path, options = {}) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+      const text = await res.text();
+      let data;
+      try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+      if (!res.ok) {
+        const detail = (data && data.detail) ? data.detail : data;
+        throw new Error(`${res.status} ${res.statusText}: ${detail}`);
+      }
+      return data;
+    }
+
+    // ===== Tabs =====
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', 'false'));
+        t.setAttribute('aria-selected', 'true');
+        const p = t.dataset.panel;
+        ['battery','stations','buy'].forEach(k => {
+          const panel = $(`panel-${k}`);
+          panel.style.display = (k === p) ? '' : 'none';
+        });
+        out(`Switched to ${p}.`);
+      });
+    });
+
+    // ===== Battery Tracker =====
+    // default date
+    $('sDate').value = new Date().toISOString().slice(0,10);
+
+    $('btnCreateVehicle').addEventListener('click', async () => {
+      clearMsg('batteryMsg');
+      try {
+        const payload = {
+          make: $('vMake').value,
+          model: $('vModel').value,
+          year: Number($('vYear').value),
+          connector_type: $('vConnector').value || null,
+        };
+        const data = await api('/vehicles', { method: 'POST', body: JSON.stringify(payload) });
+        out(data);
+        msg('batteryMsg', 'ok', `Vehicle created. ID = <b>${data.id}</b>. Paste it into Vehicle ID below.`);
+      } catch (e) {
+        out(String(e));
+        msg('batteryMsg', 'err', String(e));
+      }
+    });
+
+    $('btnListVehicles').addEventListener('click', async () => {
+      clearMsg('batteryMsg');
+      try {
+        const data = await api('/vehicles');
+        out(data);
+        msg('batteryMsg', 'ok', `Found ${Array.isArray(data) ? data.length : 0} vehicles.`);
+      } catch (e) {
+        out(String(e));
+        msg('batteryMsg', 'err', String(e));
+      }
+    });
+
+    $('btnAddSnapshot').addEventListener('click', async () => {
+      clearMsg('batteryMsg');
+      try {
+        const vehicleId = Number($('vehicleId').value);
+        if (!vehicleId) throw new Error('Please enter a valid Vehicle ID.');
+        const payload = {
+          vehicle_id: vehicleId,
+          snapshot_date: $('sDate').value,
+          odometer_mi: Number($('sOdo').value),
+          full_charge_range_mi: $('sRange').value ? Number($('sRange').value) : null,
+          soh_pct: $('sSoh').value ? Number($('sSoh').value) : null,
+          notes: null,
+        };
+        const data = await api('/battery/snapshots', { method: 'POST', body: JSON.stringify(payload) });
+        out(data);
+        msg('batteryMsg', 'ok', 'Snapshot added. Now click “Get Health”.');
+      } catch (e) {
+        out(String(e));
+        msg('batteryMsg', 'err', String(e));
+      }
+    });
+
+    $('btnGetHealth').addEventListener('click', async () => {
+      clearMsg('batteryMsg');
+      try {
+        const vehicleId = Number($('vehicleId').value);
+        if (!vehicleId) throw new Error('Please enter a valid Vehicle ID.');
+        const data = await api(`/battery/health/${vehicleId}`);
+        out(data);
+        msg('batteryMsg', 'ok', data.message || 'Health computed.');
+      } catch (e) {
+        out(String(e));
+        msg('batteryMsg', 'err', String(e));
+      }
+    });
+
+    // ===== Stations =====
+    $('btnListStations').addEventListener('click', async () => {
+      clearMsg('stationsMsg');
+      try {
+        const data = await api('/stations');
+        out(data);
+        msg('stationsMsg', 'ok', `Loaded ${Array.isArray(data) ? data.length : 0} stations.`);
+      } catch (e) {
+        out(String(e));
+        msg('stationsMsg', 'err', String(e));
+      }
+    });
+
+    $('btnRecommendStations').addEventListener('click', async () => {
+      clearMsg('stationsMsg');
+      try {
+        const lat = Number($('lat').value);
+        const lon = Number($('lon').value);
+        const connector = $('stConnector').value;
+        const vmax = $('vehicleMaxKw').value ? Number($('vehicleMaxKw').value) : '';
+
+        const qs = new URLSearchParams({ lat: String(lat), lon: String(lon), limit: '5' });
+        if (connector) qs.set('connector_type', connector);
+        if (vmax !== '') qs.set('vehicle_max_kw', String(vmax));
+
+        const data = await api(`/stations/recommend?${qs.toString()}`);
+        out(data);
+        msg('stationsMsg', 'ok', 'Recommendations computed.');
+      } catch (e) {
+        out(String(e));
+        msg('stationsMsg', 'err', String(e));
+      }
+    });
+
+    // ===== Buy =====
+    $('btnRecommendEvs').addEventListener('click', async () => {
+      clearMsg('buyMsg');
+      try {
+        const payload = {
+          budget: Number($('budget').value),
+          min_range_mi: Number($('minRange').value),
+          wants_awd: $('wantsAwd').checked,
+          needs_cargo_cuft: Number($('cargo').value || 0),
+          prefers_connector: $('buyConnector').value || null,
+        };
+        const data = await api('/buy/recommend', { method: 'POST', body: JSON.stringify(payload) });
+        out(data);
+        msg('buyMsg', 'ok', 'Recommendations generated.');
+      } catch (e) {
+        out(String(e));
+        msg('buyMsg', 'err', String(e));
+      }
+    });
+
+    // Initial ping
+    api('/health').then(d => out({ boot: 'ok', health: d })).catch(e => out(`Backend not reachable yet: ${e}`));
+  </script>
+</body>
+</html>
