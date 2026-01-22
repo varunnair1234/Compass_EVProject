@@ -1,4 +1,4 @@
-# Compass_EVProject
+# Compass: EVProject
 
 Compass is a lightweight web application that helps electric vehicle owners and buyers make better decisions by combining data tracking, simple ML-driven insights, and a clean web interface.
 
