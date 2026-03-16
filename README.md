@@ -1,68 +1,51 @@
-# Compass: EVProject
+# ⚡ Compass: EVProject
 
-Compass is a lightweight web application that helps electric vehicle owners and buyers make better decisions by combining data tracking, simple ML-driven insights, and a clean web interface.
+Compass is an intelligent web application designed to simplify the transition to electric mobility. By combining real-time data tracking with neural-network-driven insights, Compass helps users manage battery health, locate optimized charging, and find the perfect vehicle.
 
-Compass focuses on three core questions:
-1. How healthy is my EV battery over time?
-2. Where should I charge right now?
-3. Which EV should I buy given my needs and budget?
+## 👥 Project Team
+
+| Team Member | Role | Location | Time Zone |
+| :--- | :--- | :--- | :--- |
+| **Varun Nair** | Engineer | Santa Cruz, CA | PST |
+| **Nisheeth Chowdary Velicheti** | Engineer | Santa Cruz, CA | PST |
+| **Venkata Sai Anand Yadlapati** | Engineer | Santa Cruz, CA | PST |
 
 ---
 
 ## ✨ Features
 
 ### 🔋 Battery Tracker
-- Track vehicles and battery snapshots over time
-- Store odometer, full-charge range, and state-of-health (SoH)
-- Estimate battery degradation trends
-- Predict near-term battery health using baseline models (with ML hooks)
+* **Monitoring:** Track odometer, full-charge range, and State-of-Health (SoH).
+* **Predictive ML:** Estimate battery degradation trends and predict near-term health using baseline models.
 
 ### ⚡ Charge Finder
-- List nearby charging stations
-- Rank stations based on:
-  - Distance
-  - Charging power compatibility
-  - Reliability proxy
-- Designed to evolve from heuristics → ML ranking models
+* **Live Search:** Locate nearby charging stations via NREL API.
+* **Ranking Engine:** Stations are ranked based on distance, power compatibility, and reliability.
 
-### 🚗 EVs to Buy
-- Recommend EVs based on:
-  - Budget
-  - Minimum driving range
-  - Charging speed
-  - Cargo and drivetrain preferences
-- Transparent scoring with human-readable explanations
+### 🚗 Neural Recommendation (New)
+* **Neural Calibration:** A PyTorch-based model that automatically predicts user priorities (Price vs. Range) based on income and commute metrics.
+* **Weighted Scoring:** Transparent vehicle ranking using Min-Max scaling to match users with the best 130+ verified EV models.
 
 ---
 
-## 🧠 Machine Learning Approach
+## 🏗️ Architecture & ML Pipeline
 
-Compass is ML-ready but not ML-dependent.
+Compass is built with a "ML-First" philosophy, moving from data ingestion to production-ready neural networks.
 
-- Baseline logic works without trained models
-- PyTorch models are trained separately using Jupyter notebooks
-- Models are exported as TorchScript artifacts
-- Backend loads ML models if available, otherwise falls back to heuristics
+1. **Data Engineering (`01_data_processing`):** Cleaned 3,400+ raw records, standardized units, and handled multi-currency pricing anomalies.
+2. **Neural Training (`03_neural_calibration`):** Built a PyTorch Feedforward Neural Network using **Softmax Activation** to calibrate user preferences.
+3. **Model Export (`04_model_export`):** Intelligence is exported as `.pth` artifacts, allowing the FastAPI backend to load the "brain" without retraining.
 
-This ensures robustness, explainability, and easy iteration.
-
----
-
-## 🏗️ Architecture
-
-- Frontend: Static HTML/CSS/JS (`index.html`)
-- Backend: FastAPI (Python)
-- Database: PostgreSQL
-- ML: PyTorch (training via `.ipynb`)
-- Hosting: AWS
-
-Frontend communicates with the backend via REST APIs.
+* **Frontend:** Static HTML/CSS/JS (`index.html`)
+* **Backend:** FastAPI (Python)
+* **ML Framework:** PyTorch
+* **Infrastructure:** AWS
 
 ---
 
 ## 📁 Repository Structure
 
-This keeps the system:
-	•	Robust
-	•	Explainable
-	•	Easy to iterate on
+* `notebooks/`: End-to-end ML lifecycle (Processing, Simulation, Training, Export).
+* `data/`: Raw and high-integrity cleaned EV datasets.
+* `saved_models/`: Production-ready PyTorch model binaries.
+* `compiled_vehicle_models_data.csv`: Source data.
